@@ -1,2 +1,3 @@
-# AliassPygame
-Python game with many thing
+# AliassGame 
+
+use Pygame 
