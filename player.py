@@ -11,7 +11,7 @@ class Player(pygame.sprite.Sprite):
         self.direction = pygame.math.Vector2()
         self.pos = pygame.math.Vector2(self.rect.center)
         self.speed = 200
-    
+        self.status = "down_idle"
 
     def input(self):
         keys = pygame.key.get_pressed()
@@ -20,8 +20,10 @@ class Player(pygame.sprite.Sprite):
             self.direction.y = 0
         elif keys[pygame.K_w]:
             self.direction.y = -1
+            self.status = "move_up"
         elif keys[pygame.K_s]:
             self.direction.y = 1
+            self.status = "move_down"
         else :
             self.direction.y = 0
 
@@ -31,8 +33,10 @@ class Player(pygame.sprite.Sprite):
             self.direction.x = 0
         elif keys[pygame.K_a]:
             self.direction.x = -1
+            self.status = "move_left"
         elif keys[pygame.K_d]:
             self.direction.x = 1
+            self.status = "move_right"
         else :
             self.direction.x = 0
         
@@ -43,12 +47,24 @@ class Player(pygame.sprite.Sprite):
 
         if self.direction.x * self.direction.y != 0:
             self.direction = self.direction.normalize()
-            print(self.direction)
+            
 
-        # calculate position 
-        self.pos += self.direction * self.speed * dt
-        self.rect = self.pos
+        # horizontal
+        self.pos.x += self.direction.x * self.speed * dt
+        self.rect.centerx = self.pos.x
+        # vertical
+        self.pos.y += self.direction.y * self.speed * dt
+        self.rect.centery = self.pos.y
+
+    def animation(self):
+        path = "/animations/" 
+
+        self.animations = {"move_up":[], "move_down":[], "move_right":[], "move_left":[],
+                          "up_idle":[], "down_idle":[], "right_idle":[], "left_idle":[]}
+        for animation in self.animations.keys():
+            print(path + animation)
 
     def update(self, dt):
         self.move(dt)
+        self.animation()
         
