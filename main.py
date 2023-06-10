@@ -17,9 +17,10 @@ class Game:
                     pygame.quit()
                     sys.exit()
 
-            dt = self.clock.tick(60) /1000
+            dt = self.clock.tick(600) /1000
             self.level.run(dt)
             pygame.display.update()
+            #get_mouse_pos()
 
 
 if __name__ == '__main__':
