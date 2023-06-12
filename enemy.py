@@ -1,4 +1,5 @@
 import pygame
+import math
  
 
 class Enemy(pygame.sprite.Sprite):
@@ -8,8 +9,9 @@ class Enemy(pygame.sprite.Sprite):
         self.type = type
         self.dict = self.take_attribute()
         
-        self.image = pygame.Surface((self.dict["height"], self.dict["width"]))
-        self.rect = self.image.get_rect(center = pos)
+        #self.image = pygame.Surface((self.dict["height"], self.dict["width"]))
+        self.image = pygame.image.load("animations/enemy/creep.png")
+        self.rect = self.image.get_rect(topleft = pos)
         self.pos = pygame.math.Vector2(self.rect.center)
         self.direction = pygame.math.Vector2()
 
@@ -18,7 +20,7 @@ class Enemy(pygame.sprite.Sprite):
     
     def take_attribute(self):
         if self.type == "creep":
-            return {"hp": 500, "damge": 50,"height":32, "width":32}
+            return {"hp": 500, "damge": 50,"height":64, "width":64}
         elif self.type == "miniboss":
             return {"hp": 500, "damge": 50,"height":150, "width":150}
         else:
@@ -41,15 +43,18 @@ class Enemy(pygame.sprite.Sprite):
 
         #print(self.direction)
 
-
+    def distanct (self, player):
+        return ( math.sqrt( pow(self.pos.x - player.pos.x, 2) + pow(self.pos.y - player.pos.y, 2)) )
+    
     def move(self, dt, player):
         self.define_direct(player)
+        
+        if self.distanct(player) < 1000:
+            self.pos.x += self.direction.x * self.speed * dt
+            self.rect.centerx = self.pos.x 
 
-        self.pos.x += self.direction.x * self.speed * dt
-        self.rect.centerx = self.pos.x 
-
-        self.pos.y += self.direction.y * self.speed * dt
-        self.rect.centery = self.pos.y
+            self.pos.y += self.direction.y * self.speed * dt
+            self.rect.centery = self.pos.y
 
     
     def update(self, dt, player, display_surface):
@@ -57,6 +62,9 @@ class Enemy(pygame.sprite.Sprite):
         self.hp_bar = Enemy_hp_bar(self)
         self.hp_bar.update()
         self.hp_bar.draw(display_surface)
+        self.distanct(player)
+
+    
         
 
         #self.define_direct(player)
@@ -65,7 +73,9 @@ class Enemy(pygame.sprite.Sprite):
 class Enemy_hp_bar():
     def __init__(self, enemy):
 
-        self.image = pygame.Surface((enemy.dict["width"], 20))
+        self.height = self.bar_height(enemy)
+        self.width = enemy.dict["width"]
+        self.image = pygame.Surface((self.width, self.height))
         self.image.fill("red")
         self.rect = self.image.get_rect(center = enemy.pos)
         self.enemy_height = enemy.dict["height"]
@@ -73,7 +83,16 @@ class Enemy_hp_bar():
 
     def follow_object(self):
         self.rect.centery = self.enemy_pos - (self.enemy_height/2 + 30)
+        
 
+    def bar_height(self, enemy):
+        if enemy.type == "creep":
+            return 10
+        elif enemy.type == "miniboss":
+            return 15
+        else:
+            return 20
+        
     def update(self):
         self.follow_object()
 

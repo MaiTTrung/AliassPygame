@@ -12,7 +12,7 @@ class Bar(pygame.sprite.Sprite):
         self.bar_color = color
         self.image = pygame.Surface((self.max_width_bar,self.bar_height))
         self.image.fill(color)
-        self.rect =self.image.get_rect(center = pos)
+        self.rect =self.image.get_rect(topleft = pos)
         self.pos = pygame.math.Vector2(self.rect.center)
         self.bar_class = bar_class
         self.bar_type = type

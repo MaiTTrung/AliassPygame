@@ -3,16 +3,16 @@ from settings import *
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, group):
+    def __init__(self, pos, group, obstacle_sprites):
         super().__init__(group)
 
-        #animation image pos 
-        self.image = pygame.Surface((32,64))
-        self.image.fill("black")
-        self.rect = self.image.get_rect(center = pos)
+        #animation sprite 
+        self.image = pygame.image.load("animations/idle/0.png")
+        #self.image.fill("black")
+        self.rect = self.image.get_rect(topleft = pos)
         self.direction = pygame.math.Vector2()
         self.pos = pygame.math.Vector2(self.rect.center)
-
+        self.obstacle_sprites = obstacle_sprites
         # attributes
         self.hp_max = 10
         self.hp = 10
@@ -23,7 +23,24 @@ class Player(pygame.sprite.Sprite):
         self.speed = 200
         self.status = "idle"
         
+    def collision(self, direction):
+        if direction == "horizontal":
+            for sprite in self.obstacle_sprites:
+                if sprite.rect.colliderect(self.rect):
+                    if self.direction.x > 0:
+                        self.rect.right = sprite.rect.left
 
+                    if self.direction.x < 0:
+                        self.rect.left = sprite.rect.right
+
+        if direction == "vertical":
+            for sprite in self.obstacle_sprites:
+                if sprite.rect.colliderect(self.rect):
+                    if self.direction.y > 0:
+                        self.rect.bottom = sprite.rect.top
+                    if self.direction.y < 0 :
+                        self.rect.top = sprite.rect.bottom
+                        
     def input(self,dt):
         # get button & mouse
         keys = pygame.key.get_pressed()
@@ -60,12 +77,14 @@ class Player(pygame.sprite.Sprite):
         else:
             self.speed = 200
             self.back_stamina(dt)
-        
+    
+    
+
     def speed_up(self,dt):
         if self.stamina > 0 and self.direction.magnitude() > 0:
             self.speed = 400
             self.stamina = self.stamina - (1  * 1.7 * dt)
-            print(self.speed, self.stamina, dt)
+
         else:
             self.speed = 200
 
@@ -84,11 +103,15 @@ class Player(pygame.sprite.Sprite):
             self.status = "idle"    
 
         # horizontal
-        self.pos.x += self.direction.x * self.speed * dt
-        self.rect.centerx = self.pos.x
+        self.rect.x += self.direction.x * self.speed * dt
+        #self.rect.centerx = self.pos.x
+        self.pos.x = self.rect.centerx
+        self.collision("horizontal")
         # vertical
-        self.pos.y += self.direction.y * self.speed * dt
-        self.rect.centery = self.pos.y
+        self.rect.y += self.direction.y * self.speed * dt
+        #self.rect.centery = self.pos.y
+        self.pos.y = self.rect.centery
+        self.collision("vertical")
 
     def animation(self):
         path = "/animations/" 

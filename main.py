@@ -10,6 +10,7 @@ class Game:
         pygame.display.set_caption("Aliass")
         self.clock = pygame.time.Clock()
         self.level = Level()
+
     def run(self):
         while True:
             for event in pygame.event.get():
@@ -20,6 +21,7 @@ class Game:
             dt = self.clock.tick(600) /1000
             self.level.run(dt)
             pygame.display.update()
+            print(self.clock)
             #get_mouse_pos()
 
 
